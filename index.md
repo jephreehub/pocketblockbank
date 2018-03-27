@@ -1,37 +1,191 @@
-## Welcome to GitHub Pages
+#public class Block {
 
-You can use the [editor on GitHub](https://github.com/jephreehub/pocketblockbank/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+  private int index;
+  private long timestamp;
+  private String hash;
+  private String previousHash;
+  private String data;
+  private int nonce;
+	
+  // ...
+public static String calculateHash(Block block) {
+  if (block != null) {
+    MessageDigest digest = null;
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+    try {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      return null;
+    }
 
-### Markdown
+    String txt = block.str();
+    final byte bytes[] = digest.digest(txt.getBytes());
+    final StringBuilder builder = new StringBuilder();
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+    for (final byte b : bytes) {
+      String hex = Integer.toHexString(0xff & b);
 
-```markdown
-Syntax highlighted code block
+      if (hex.length() == 1) {
+        builder.append('0');
+      }
 
-# Header 1
-## Header 2
-### Header 3
+      builder.append(hex);
+    }
 
-- Bulleted
-- List
+    return builder.toString();
+  }
 
-1. Numbered
-2. List
+  return null;
+}
+public void mineBlock(int difficulty) {
+  nonce = 0;
 
-**Bold** and _Italic_ and `Code` text
+  while (!getHash().substring(0,  difficulty).equals(Utils.zeros(difficulty))) {
+    nonce++;
+    hash = Block.calculateHash(this);
+  }
+}
+public static String calculateHash(Block block) {
+  if (block != null) {
+    MessageDigest digest = null;
 
-[Link](url) and ![Image](src)
-```
+    try {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      return null;
+    }
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+    String txt = block.str();
+    final byte bytes[] = digest.digest(txt.getBytes());
+    final StringBuilder builder = new StringBuilder();
 
-### Jekyll Themes
+    for (final byte b : bytes) {
+      String hex = Integer.toHexString(0xff & b);
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/jephreehub/pocketblockbank/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+      if (hex.length() == 1) {
+        builder.append('0');
+      }
 
-### Support or Contact
+      builder.append(hex);
+    }
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+    return builder.toString();
+  }
+
+  return null;
+}
+package fr.toutsurlebitcoin.myblockchain;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+
+public class Block {
+
+  private int index;
+  private long timestamp;
+  private String hash;
+  private String previousHash;
+  private String data;
+  private int nonce;
+	
+  public Block(int index, long timestamp, String previousHash, String data) {
+    this.index = index;
+    this.timestamp = timestamp;
+    this.previousHash = previousHash;
+    this.data = data;
+    nonce = 0;
+    hash = Block.calculateHash(this);
+  }
+
+  public int getIndex() {
+    return index;
+  }
+
+  public long getTimestamp() {
+    return timestamp;
+  }
+
+  public String getHash() {
+    return hash;
+  }
+
+  public String getPreviousHash() {
+    return previousHash;
+  }
+
+  public String getData() {
+    return data;
+  }
+
+  public String str() {
+    return index + timestamp + previousHash + data + nonce;
+  }
+
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Block #").append(index).append(" [previousHash : ").append(previousHash).append(", ").
+    append("timestamp : ").append(new Date(timestamp)).append(", ").append("data : ").append(data).append(", ").
+    append("hash : ").append(hash).append("]");
+    return builder.toString();
+  }
+	
+  public static String calculateHash(Block block) {
+    if (block != null) {
+      MessageDigest digest = null;
+
+      try {
+        digest = MessageDigest.getInstance("SHA-256");
+      } catch (NoSuchAlgorithmException e) {
+        return null;
+      }
+			
+      String txt = block.str();
+      final byte bytes[] = digest.digest(txt.getBytes());
+      final StringBuilder builder = new StringBuilder();
+			
+      for (final byte b : bytes) {
+        String hex = Integer.toHexString(0xff & b);
+
+        if (hex.length() == 1) {
+          builder.append('0');
+        }
+				
+        builder.append(hex);
+      }
+			
+      return builder.toString();
+    }
+	  
+    return null;
+  }
+
+   public void mineBlock(int difficulty) {
+     nonce = 0;
+		
+     while (!getHash().substring(0,  difficulty).equals(Utils.zeros(difficulty))) {
+       nonce++;
+       hash = Block.calculateHash(this);
+     }
+  }
+	
+}
+package fr.toutsurlebitcoin.myblockchain;
+
+public class Main1 {
+
+  public static void main(String[] args) {
+    Blockchain blockchain = new Blockchain(4);
+    blockchain.addBlock(blockchain.newBlock("Tout sur le Bitcoin"));
+    blockchain.addBlock(blockchain.newBlock("Sylvain Saurel"));
+    blockchain.addBlock(blockchain.newBlock("https://www.toutsurlebitcoin.fr"));
+  
+    System.out.println("Blockchain valid ? " + blockchain.isBlockChainValid());
+    System.out.println(blockchain);
+  }
+
+}
+}
+ 
+	
+  // ...
